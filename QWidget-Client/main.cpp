@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "timecatcher.h"
 #include "mythread.h"
 #include "threadsObject.h"
 #include "mytimer.h"

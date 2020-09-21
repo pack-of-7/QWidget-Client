@@ -15,7 +15,6 @@
 #include "mythreadsobject.h"
 #include "threadsObject.h"
 #include "mytimer.h"
-#include "serverdialog.h"
 
 using std::string;
 
@@ -82,7 +81,6 @@ private:
      QTimer         *m_updateTimer;
      MyTimer        *m_myTimer;
      Data *m_data;
-     ServerDialog *serverDialog;
     // QThread *m_td;
 //     QThread *cThread;
 //     ThreadsObject cObject;

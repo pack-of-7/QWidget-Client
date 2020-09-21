@@ -2,11 +2,9 @@
 #include "ui_mainwindow.h"
 #include "MqttClient.h"
 #include "Data.h"
-#include "timecatcher.h"
 #include "mythreadsobject.h"
 #include "threadsObject.h"
 #include "mytimer.h"
-#include "serverdialog.h"
 
 #include <QtCore/QVariant>
 #include <QtCore/QByteArray>
@@ -236,8 +234,3 @@ void MainWindow::on_stopButton_clicked()
 
 }
 
-void MainWindow::on_serverInfoButton_clicked()
-{
-    serverDialog = new ServerDialog(this);
-    serverDialog->show();
-}
