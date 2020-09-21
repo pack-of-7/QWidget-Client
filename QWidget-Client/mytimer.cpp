@@ -1,6 +1,5 @@
 #include "mytimer.h"
-#include <QDebug>
-#include <QRandomGenerator>
+
 MyTimer::MyTimer()
 {
     //create Timer

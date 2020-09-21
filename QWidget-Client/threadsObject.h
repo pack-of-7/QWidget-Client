@@ -10,6 +10,9 @@
 #include <QDebug>
 #include <QSettings>
 #include <QMessageBox>
+#include <QMessageBox>
+#include <QtCore>
+
 #include <mainwindow.h>
 
 class ThreadsObject : public QThread

@@ -63,13 +63,7 @@ private slots:
 
     void on_publishButton_clicked();
 
-    void on_subscibeButton_clicked();
 
-    void on_startButton_clicked();
-
-    void on_stopButton_clicked();
-
-    void on_serverInfoButton_clicked();
 
 private:
     Ui::MainWindow *ui;

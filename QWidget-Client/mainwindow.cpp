@@ -23,7 +23,6 @@
 #include <QThread>
 #include <QtDebug>
 #include <iostream>
-#include <ui_serverdialog.h>
 
 using std::cout;
 
@@ -177,20 +176,7 @@ void MainWindow::on_publishButton_clicked()
    }
 }
 
-void MainWindow::on_subscibeButton_clicked()
-{
 
-    if(m_mqttClient->state()==QMqttClient::Disconnected){
-        connect(m_mqttClient, &MqttClient::HostConnectionUpdate,
-                this, &MainWindow::unsubscribeMqtt);
-       QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Could not subscribe. Is there a valid connection?"));
-        return;
-    }
-
-   connect(m_mqttClient, &MqttClient::HostConnectionUpdate,
-            this, &MainWindow::subscribeMqtt);
-
-}
 
 void MainWindow::onDoWork(QString &qAppVersion, QString &endpoint_token)
 {
@@ -220,17 +206,3 @@ void MainWindow::onDoWork(QString &qAppVersion, QString &endpoint_token)
     }
 
 }
-
-void MainWindow::on_startButton_clicked()
-{
- // Start
-    //mThread->start();
-}
-
-void MainWindow::on_stopButton_clicked()
-{
-    //mThread->Stop=true;
-    //qDebug() << "stop Stop" << mThread->Stop;
-
-}
-

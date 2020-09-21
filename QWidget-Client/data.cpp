@@ -1,11 +1,5 @@
 #include "data.h"
-#include <QtCore/QByteArray>
-#include <QtCore/QStringList>
-#include <QtCore/QByteArray>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QJsonObject>
-#include <QtCore/QJsonObject>
+
 
 //Data::Data(QObject *parent):
   //  QObject (parent)

@@ -1,6 +1,5 @@
 #include "threadsObject.h"
-#include <QMessageBox>
-#include <QtCore>
+
 
 ThreadsObject::ThreadsObject(QObject *parent):
     QThread(parent)
@@ -31,7 +30,7 @@ void ThreadsObject::DoSetup(QThread &cThread)
     td_settings->sync();
 
     td_mqttClient->connectBroker();
-
+    
 
     if (td_mqttClient->state() == QMqttClient::Connected){
         for(int i =0; i<10; i++)

@@ -1,8 +1,6 @@
 #include "mythreadsobject.h"
 #include "mainwindow.h"
-#include <QtCore>
-#include <QSettings>
-#include <QString>
+
 
 MyThreadsObject::MyThreadsObject(QObject *parent):
     QThread(parent)

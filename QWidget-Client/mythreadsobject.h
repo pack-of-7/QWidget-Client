@@ -4,7 +4,8 @@
 #include "mainwindow.h"
 #include <QThread>
 #include <QSettings>
-
+#include <QtCore>
+#include <QString>
 #include <QObject>
 
 class MyThreadsObject : public QThread

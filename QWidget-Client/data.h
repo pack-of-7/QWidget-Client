@@ -3,7 +3,6 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QStringList>
-#include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QJsonObject>

@@ -6,6 +6,8 @@
 #include <QTimer>
 #include <MqttClient.h>
 #include <QSettings>
+#include <QDebug>
+#include <QRandomGenerator>
 
 class MyTimer:public QObject
 {
