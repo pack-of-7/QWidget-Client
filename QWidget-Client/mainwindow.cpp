@@ -1,18 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "MqttClient.h"
-#include "Data.h"
-#include "mythreadsobject.h"
-#include "threadsObject.h"
-#include "mytimer.h"
-
 #include <QtCore/QVariant>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QDateTime>
 #include <QtMqtt/QMqttClient>
 #include <QtWidgets/QMessageBox>
-
 #include <QMqttStringPair>
 #include <QtCore/QJsonObject>
 #include <QString>
@@ -22,187 +16,100 @@
 #include <QTextStream>
 #include <QThread>
 #include <QtDebug>
+#include <QtQml/QQmlEngine>
+#include <QtQml/QQmlContext>
+
 #include <iostream>
 
 using std::cout;
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(CO2SensorIF *co2Sensor, QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow),
-    m_updateSecs(15 * 60),
-    m_minUpdateSecs(60)
+    , ui(new Ui::MainWindow)
+    , m_co2Sensor(co2Sensor)
+
 {
     ui->setupUi(this);
+     connect(m_co2Sensor, &CO2SensorIF::newCO2, this, &MainWindow::co2Update);
+     connect(m_co2Sensor, &CO2SensorIF::newSweepGas, this, &MainWindow::sweepGasFlowUpdate);
 
+    ui->quickWidget->engine()->rootContext()->setContextProperty("CO2Data", this);
+    ui->quickWidget->engine()->rootContext()->setContextProperty("SweepGasData", this);
+    ui->quickWidget->setSource(QUrl("qrc:/Chart.qml"));
+    ui->quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-    //connect(mThread,SIGNAL(NumberChanged(int)),this,SLOT(onNumberChanged(int)));
-    //connect(mThread,SIGNAL(DoWork(QString, QString)),this,SLOT(onDoWork(QString, QString)));
+    m_client = new QMqttClient(this);
+    m_client->setHostname(hostName);
 
-//    cObject->DoSetup(&cThread);
-//    cObject->moveToThread(&cThread);
+    m_settings = new QSettings();
+    qHostname = m_settings->value("mqtt/broker", hostName).toString();
+    qPort    = m_settings->value("mqtt/port", port).toInt();
+    qAppVersion=m_settings->value("mqtt/applicationsVersion",applications_version).toString();
+    qEndpointToken=m_settings->value("mqtt/endpointToken",endpoint_token).toString();
 
+    m_mqttClient = new MqttClient(this);
+    m_mqttClient->setPort(qPort);
+    m_mqttClient->setHostname(qHostname);
+    m_mqttClient->setEndpointToken(qEndpointToken);
+    m_mqttClient->setAppVersion(qAppVersion);
+    m_settings->sync();
 
-
-     m_client = new QMqttClient(this);
-     m_client->setHostname(hostName);
-
-     m_settings = new QSettings();
-     qHostname = m_settings->value("mqtt/broker", hostName).toString();
-     qPort    = m_settings->value("mqtt/port", port).toInt();
-     qAppVersion=m_settings->value("mqtt/applicationsVersion",applications_version).toString();
-     qEndpointToken=m_settings->value("mqtt/endpointToken",endpoint_token).toString();
-
-     m_mqttClient = new MqttClient(this);
-     m_mqttClient->setPort(qPort);
-     m_mqttClient->setHostname(qHostname);
-     m_mqttClient->setEndpointToken(qEndpointToken);
-     m_mqttClient->setAppVersion(qAppVersion);
-     m_settings->sync();
-
-     qDebug() << qHostname;
-     qDebug() << qPort;
-     qDebug()<< "qAppVersion : "<<qAppVersion;
-     qDebug() << m_client;
+    qDebug() << qHostname;
+    qDebug() << qPort;
+    qDebug()<< "qAppVersion : "<<qAppVersion;
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+   // m_mqttClient->disconnectBroker();
 }
 
-void MainWindow::unsubscribeMqtt(QString state, const QString &hostname, const quint16 port,const QString &id, const QString &appVersion, const QString &endpointTocken)
+void MainWindow::co2Update(QDateTime timestamp, float co2)
 {
-     qDebug() << "unsubscribeMqttConnection";
-     //{{HOST_CONNECT}}/kp1/{{APPVERSION_NAME}}/epmx/{{TOKEN}}/get
-     //"mqtt.cloud.kaaiot.com/kp1/bt8h4h2ikfmg80udn370-1/epmx/DY5oex7rC3/get"
-     qDebug() << hostname << " " << appVersion << " " << endpointTocken;
-
-     auto msg = QString("%1/kp1/%2/epmx/%3/get")
-        .arg(hostname)
-        .arg(appVersion)
-        .arg(endpointTocken);
-     //statusBar()->showMessage(msg);
-     qDebug() << "msg: " <<  msg;
-     qDebug() << "state: " << state;
-     m_client->unsubscribe(msg);
+    // ** update the m_lastReading **
+    double xVal = timestamp.toSecsSinceEpoch();
+    QDateTime dt;
+    dt.setTime_t(xVal/1000);
+    //ui->lineEdit_DateTime->setText(dt.toString("yyyy-MM-dd hh:mm:ss"));
+    qDebug() << dt.toString("hh:mm:ss");
+    qDebug() << "xVal" << xVal << ", co2" << co2;
+    setLastReadingCO2(QPointF(xVal, co2));
 }
 
-void MainWindow::subscribeMqtt(QString state, const QString &hostname, const quint16 port,  const QString &id, const QString &appVersion, const QString &endpointTocken)
+void MainWindow::sweepGasFlowUpdate(QDateTime timestamp, float sweepGas)
 {
-    qDebug() << "subscribeMqttConnection";
-    qDebug() << state << " " << hostname << " " << port << " " << appVersion << " " << endpointTocken;
-
-    //{{HOST_CONNECT}}/kp1/{{APPVERSION_NAME}}/epmx/{{TOKEN}}/get
-    //"mqtt.cloud.kaaiot.com/kp1/bt8h4h2ikfmg80udn370-1/epmx/DY5oex7rC3/get"
-    //auto msg = QString("%1:%2/kp1/%3/epmx/%4/get")
-    //  .arg(hostname)
-    //  .arg(port)
-    auto msg = QString("%1/kp1/%2/epmx/%3/get")
-            .arg(hostname)
-            .arg(appVersion)
-            .arg(endpointTocken);
-           // .arg(state);
-    //statusBar()->showMessage(msg);
-    qDebug() << "subscribeQMttMsg: " <<  msg;
-    qDebug() << "state: " << state;
-
-        auto subscription = m_client->subscribe(msg,port);
-        qDebug() << __FUNCTION__ << subscription->Subscribed;
-        qDebug() << __FUNCTION__ << subscription->SubscriptionPending;
-
-        if (!subscription) {
-            //QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Could not subscribe. Is there a valid connection?"));
-                return;
-        }
-
+    // ** update the m_lastReading **
+    double xVal = timestamp.toSecsSinceEpoch();
+    qDebug() << "xVal" << xVal << ", sweepGas" << sweepGas;
+    setLastReadingSweepGas(QPointF(xVal, sweepGas));
 }
 
-
-void MainWindow::on_connectButton_clicked()
+void MainWindow::setLastReadingCO2(const QPointF &lastReading)
 {
-    //connect(m_mqttClient, &MqttClient::HostConnectionUpdate,
-      //      this, &MainWindow::updateMqttConnection);
-    m_mqttClient->connectBroker();
+    qDebug() << "setLastReadingCO2: " << lastReading;
+    m_lastReadingCO2 = lastReading; 
 
-    qDebug() << "Broker connected: " + hostName;
-
+    emit newReadingCO2();
 }
 
-void MainWindow::on_disconnectButton_clicked()
+QPointF MainWindow::lastReadingCO2() const
 {
+    qDebug() << "return lastReadingCO2: " << m_lastReadingCO2;
+    return m_lastReadingCO2;
+}
+void MainWindow::setLastReadingSweepGas(const QPointF &lastReading)
+{
+    qDebug() << "setLastReadingSweepGas: " << lastReading;
+    m_lastReadingSweepGas = lastReading;    
 
-    connect(m_mqttClient, &MqttClient::HostConnectionUpdate,
-            this, &MainWindow::unsubscribeMqtt);
-    m_mqttClient->disconnectBroker();
-    qDebug() << "Broker disconnected: "+ hostName;
-    //mThread->Stop=true;
-    //qDebug() << "stop Stop" << mThread->Stop;
-
+    emit newReadingSweepGas();
 }
 
-void MainWindow::on_publishButton_clicked()
+QPointF MainWindow::lastReadingSweepGas() const
 {
-   if (m_mqttClient->state() == QMqttClient::Connected)
-{
-
-       //'kp1/{APPLICATION_VERSION}/dcx/{ENDPOINT_TOKEN}/json'
-
-        double temp= (double)QRandomGenerator::global()->bounded(15, 45);
-        double humidity= (double)QRandomGenerator::global()->bounded(0, 100);
-        int co2 = QRandomGenerator::global()->bounded(100, 2000);
-        double battery_level= (double)QRandomGenerator::global()->bounded(0, 1000);
-        int pressure= QRandomGenerator::global()->bounded(100, 2000);
-        qDebug() << temp << " " << humidity << " " << co2 << " " << battery_level<< " " << pressure;
-        QString json = QString("[{\"temperature\":%1,\"humidity\": %2,\"co2\":%3,\"battery_level\": %4,\"pressure\":%5}]")
-               .arg(temp)
-               .arg(humidity)
-               .arg(co2)
-               .arg(battery_level)
-               .arg(pressure);
-
-        QString json1="[{\"temperature\":30,\"humidity\": 63,\"co2\":500,\"battery_level\": 85.7,\"pressure\":400}]";
-
-        QByteArray baMessage=json.toUtf8();
-        auto stateString =QString("kp1/%1/dcx/%2/json")
-                .arg(qAppVersion)
-                .arg(endpoint_token);
-        m_mqttClient->SendStatus(stateString,baMessage);
-    }
-   else
-   {
-       QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Could not publish. Is there a valid connection?"));
-        return;
-   }
+    qDebug() << "lastReadingSweepGas: " << m_lastReadingSweepGas;
+    return m_lastReadingSweepGas;
 }
 
-
-
-void MainWindow::onDoWork(QString &qAppVersion, QString &endpoint_token)
-{
-    qDebug() << "mThread without number ";
-    for(int i =0; i<20; i++)
-    {
-        qDebug() << i;
-
-        double temp= (double)QRandomGenerator::global()->bounded(15, 45);
-        double humidity= (double)QRandomGenerator::global()->bounded(0, 100);
-        int co2 = QRandomGenerator::global()->bounded(100, 2000);
-        double battery_level= (double)QRandomGenerator::global()->bounded(0, 1000);
-        int pressure= QRandomGenerator::global()->bounded(100, 2000);
-        qDebug() << temp << " " << humidity << " " << co2 << " " << battery_level<< " " << pressure;
-        QString json = QString("[{\"temperature\":%1,\"humidity\": %2,\"co2\":%3,\"battery_level\": %4,\"pressure\":%5}]")
-               .arg(temp)
-               .arg(humidity)
-               .arg(co2)
-               .arg(battery_level)
-               .arg(pressure);
-
-        QByteArray baMessage=json.toUtf8();
-        auto stateString =QString("kp1/%1/dcx/%2/json")
-                .arg(qAppVersion)
-                .arg(endpoint_token);
-        m_mqttClient->SendStatus(stateString,baMessage);
-    }
-
-}

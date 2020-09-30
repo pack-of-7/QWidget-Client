@@ -1,5 +1,5 @@
-#ifndef MYTIMER_H
-#define MYTIMER_H
+#ifndef CO2SENSOR_H
+#define CO2SENSOR_H
 
 #include <QMainWindow>
 #include <QObject>
@@ -9,19 +9,21 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
-class MyTimer:public QObject
+#include "co2sensorif.h"
+
+class CO2Sensor: public CO2SensorIF
 {
-    Q_OBJECT
 public:
-    MyTimer();
-    QTimer *mTimer;
-
-
-public slots:
+    CO2Sensor(QObject *parent = nullptr);
     void myTimerSlots();
-    void sendData();
+    void sendDataCo2();
+    void sendDataSweepGas();
 
 private:
+    QTimer  *m_sendCO2Timer;
+    float   m_lastCO2;
+    float   m_lastSweepGas;
+
     QSettings   *t_settings;        //< access to our settings
     MqttClient  *t_mqttClient;
 
@@ -33,7 +35,6 @@ private:
     quint16 qPort;
     QString qAppVersion="";
     QString qEndpointToken="";
-
 };
 
-#endif // MYTIMER_H
+#endif // CO2SENSOR_H

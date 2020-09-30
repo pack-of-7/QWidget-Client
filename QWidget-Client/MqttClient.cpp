@@ -12,7 +12,7 @@ MqttClient::MqttClient(QObject *parent) :
     qDebug() << m_deviceName;
     qDebug() << m_client;
     QString hostName="mqtt.cloud.kaaiot.com";
-    int port = 1883;
+    //int port = 1883;
     QString endpoint_token = "DY5oex7rC3";
     QString applications_version = "bt8h4h2ikfmg80udn370-1";
 

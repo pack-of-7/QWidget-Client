@@ -1,6 +1,6 @@
-QT       += core gui network mqtt
+QT       += core gui network mqtt charts
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets quick quickwidgets
 TEMPLATE = app
 CONFIG += c++11
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -11,28 +11,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     MqttClient.cpp \
-    data.cpp \
+    co2sensor.cpp \
+    co2sensorif.cpp \
     main.cpp \
-    mainwindow.cpp \
-    mymultiserver.cpp \
-    myserver.cpp \
-    myserverthread.cpp \
-    mythread.cpp \
-    mythreadsobject.cpp \
-    mytimer.cpp \
-    threadsObject.cpp
+    mainwindow.cpp
 
 HEADERS += \
     MqttClient.h \
-    data.h \
-    mainwindow.h \
-    mymultiserver.h \
-    myserver.h \
-    myserverthread.h \
-    mythread.h \
-    mythreadsobject.h \
-    mytimer.h \
-    threadsObject.h
+    co2sensor.h \
+    co2sensorif.h \
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui
@@ -47,4 +35,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 #INSTALLS += target
 
 DISTFILES += \
+    Chart.qml \
     QWidget-Client-default.config
+
+RESOURCES += \
+    qml-chart.qrc
