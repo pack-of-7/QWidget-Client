@@ -45,8 +45,6 @@ Item {
         font.pointSize: 30
         horizontalAlignment: TextInput.AlignHCenter
         verticalAlignment: TextInput.AlignVCenter
-
-
     }
 
     Text {
@@ -80,7 +78,7 @@ Item {
         font.pointSize: 30
         horizontalAlignment: TextInput.AlignHCenter
         verticalAlignment: TextInput.AlignVCenter
-}
+    }
 
     ChartView {
        // id: lineGas
@@ -108,11 +106,13 @@ Item {
             min: 100
             max: 2000
         }
+
         ValueAxis {
             id:co2Axis
             min: 100
             max: 1000
         }
+
         LineSeries {
             id: sweepGasSeries
             name: "Sweep Gas Flow"
@@ -120,24 +120,22 @@ Item {
             axisY: sweepGasAxis      
         }
 
-
         Connections {
             target:SweepGasData
-           // onNewReading:{
+
             function onNewReadingSweepGas() {
 
                 if (sweepGasSeries.count > 10)
-                        sweepGasSeries.remove(0);
-                console.log(SweepGasData.lastReadingSweepGas.x);
-                console.log(SweepGasData.lastReadingSweepGas.y);
-                sweepGasSeries.append(SweepGasData.lastReadingSweepGas.x, SweepGasData.lastReadingSweepGas.y)
-                console.log("SweepGasData");
-                console.log(sweepGasSeries);
+                    sweepGasSeries.remove(0);
+                    console.log(SweepGasData.lastReadingSweepGas.x);
+                    console.log(SweepGasData.lastReadingSweepGas.y);
+                    sweepGasSeries.append(SweepGasData.lastReadingSweepGas.x, SweepGasData.lastReadingSweepGas.y)
+                    console.log("SweepGasData");
+                    console.log(sweepGasSeries);
 
                 // adjust time axis
                 timeAxis.min = sweepGasSeries.at(0).x
                 timeAxis.max = sweepGasSeries.at(sweepGasSeries.count -1).x
-
 
                 // adjust sweepGas axis
                 if (SweepGasData.lastReadingSweepGas.y < sweepGasAxis.min)
@@ -150,42 +148,37 @@ Item {
             }
         }
 
-
         LineSeries {
-                   id: co2Series
-                   name:"CO2"
-                   axisX: timeAxis
+            id: co2Series
+             name:"CO2"
+             axisX: timeAxis
 
+             Connections {
+                 target:CO2Data
 
+                 function onNewReadingCO2() {
+                     console.log("lastReadingCO2");
+                     console.log(CO2Data.lastReadingCO2.y);
 
-               Connections {
-                   target:CO2Data
-                  // onNewReading:{
-                   function onNewReadingCO2() {
-                       console.log("lastReadingCO2");
-                       console.log(CO2Data.lastReadingCO2.y);
+                     if (co2Series.count > 10)
+                         co2Series.remove(0);
+                         co2Series.append(CO2Data.lastReadingCO2.x, CO2Data.lastReadingCO2.y)
+                         console.log("CO2Data.lastReadingCO2.y");
+                         console.log(CO2Data.lastReadingCO2.y);
 
-                       if (co2Series.count > 10)
-                               co2Series.remove(0);
+                     // adjust time axis
+                     timeAxis.min = co2Series.at(0).x;
+                     timeAxis.max = co2Series.at(co2Series.count -1).x;
 
-                       co2Series.append(CO2Data.lastReadingCO2.x, CO2Data.lastReadingCO2.y)
-                       console.log("CO2Data.lastReadingCO2.y");
-                       console.log(CO2Data.lastReadingCO2.y);
-
-                       // adjust time axis
-                       timeAxis.min = co2Series.at(0).x;
-                       timeAxis.max = co2Series.at(co2Series.count -1).x;
-
-
-                       // adjust CO2 axis
-                       if (CO2Data.lastReadingCO2.y < co2Axis.min)
-                           co2Axis.min = CO2Data.lastReadingCO2.y;
-                        console.log(CO2Data.lastReadingCO2.y)
-                       if (CO2Data.lastReadingCO2.y > co2Axis.max)
-                           co2Axis.max = CO2Data.lastReadingCO2.y;
-                        console.log(co2Axis.max);
-                   }  }
-               }
-           }
-
+                     // adjust CO2 axis
+                     if (CO2Data.lastReadingCO2.y < co2Axis.min)
+                         co2Axis.min = CO2Data.lastReadingCO2.y;
+                         console.log(CO2Data.lastReadingCO2.y)
+                     if (CO2Data.lastReadingCO2.y > co2Axis.max)
+                         co2Axis.max = CO2Data.lastReadingCO2.y;
+                         console.log(co2Axis.max);
+                }
+             }
+        }
     }
+}

@@ -13,8 +13,6 @@
 #include <QSettings>
 #include <QRandomGenerator>
 #include <QJsonDocument>
-#include <QTextStream>
-#include <QThread>
 #include <QtDebug>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
@@ -30,8 +28,8 @@ MainWindow::MainWindow(CO2SensorIF *co2Sensor, QWidget *parent)
 
 {
     ui->setupUi(this);
-     connect(m_co2Sensor, &CO2SensorIF::newCO2, this, &MainWindow::co2Update);
-     connect(m_co2Sensor, &CO2SensorIF::newSweepGas, this, &MainWindow::sweepGasFlowUpdate);
+    connect(m_co2Sensor, &CO2SensorIF::newCO2, this, &MainWindow::co2Update);
+    connect(m_co2Sensor, &CO2SensorIF::newSweepGas, this, &MainWindow::sweepGasFlowUpdate);
 
     ui->quickWidget->engine()->rootContext()->setContextProperty("CO2Data", this);
     ui->quickWidget->engine()->rootContext()->setContextProperty("SweepGasData", this);
@@ -88,7 +86,7 @@ void MainWindow::sweepGasFlowUpdate(QDateTime timestamp, float sweepGas)
 
 void MainWindow::setLastReadingCO2(const QPointF &lastReading)
 {
-    qDebug() << "setLastReadingCO2: " << lastReading;
+    //qDebug() << "setLastReadingCO2: " << lastReading;
     m_lastReadingCO2 = lastReading; 
 
     emit newReadingCO2();
@@ -96,12 +94,12 @@ void MainWindow::setLastReadingCO2(const QPointF &lastReading)
 
 QPointF MainWindow::lastReadingCO2() const
 {
-    qDebug() << "return lastReadingCO2: " << m_lastReadingCO2;
+    //qDebug() << "return lastReadingCO2: " << m_lastReadingCO2;
     return m_lastReadingCO2;
 }
 void MainWindow::setLastReadingSweepGas(const QPointF &lastReading)
 {
-    qDebug() << "setLastReadingSweepGas: " << lastReading;
+    //qDebug() << "setLastReadingSweepGas: " << lastReading;
     m_lastReadingSweepGas = lastReading;    
 
     emit newReadingSweepGas();
@@ -109,7 +107,7 @@ void MainWindow::setLastReadingSweepGas(const QPointF &lastReading)
 
 QPointF MainWindow::lastReadingSweepGas() const
 {
-    qDebug() << "lastReadingSweepGas: " << m_lastReadingSweepGas;
+    //qDebug() << "lastReadingSweepGas: " << m_lastReadingSweepGas;
     return m_lastReadingSweepGas;
 }
 

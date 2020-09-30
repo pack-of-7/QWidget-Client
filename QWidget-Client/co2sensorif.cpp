@@ -33,7 +33,7 @@ CO2SensorIF::CO2SensorIF(QObject *parent) : QObject(parent)
          myTimerSlots();
     }
 
-    m_sendCO2TimerIf->setInterval(2000);
+    m_sendCO2TimerIf->setInterval(4000);
     m_sendCO2TimerIf->setSingleShot(false);
     m_sendCO2TimerIf->start();
 }
