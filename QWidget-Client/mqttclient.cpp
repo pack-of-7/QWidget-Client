@@ -1,5 +1,4 @@
-#include "MqttClient.h"
-
+#include "mqttclient.h"
 
 MqttClient::MqttClient(QObject *parent) :
     QObject (parent)

@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 
-#include "myserver.h"
-#include "mymultiserver.h"
 #include <QApplication>
 #include "co2sensor.h"
 

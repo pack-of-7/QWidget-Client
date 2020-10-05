@@ -24,7 +24,7 @@
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QChartGlobal>
 
-#include "MqttClient.h"
+#include "mqttclient.h"
 #include "co2sensor.h"
 
 using std::string;

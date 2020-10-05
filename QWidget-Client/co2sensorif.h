@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QObject>
 #include <QTimer>
-#include <MqttClient.h>
+#include <mqttclient.h>
 #include <QSettings>
 #include <QDebug>
 #include <QRandomGenerator>

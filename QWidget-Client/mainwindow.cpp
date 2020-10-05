@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "MqttClient.h"
+#include "mqttclient.h"
 #include <QtCore/QVariant>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
@@ -18,7 +18,6 @@
 #include <QtQml/QQmlContext>
 
 #include <iostream>
-
 using std::cout;
 
 MainWindow::MainWindow(CO2SensorIF *co2Sensor, QWidget *parent)
@@ -28,6 +27,7 @@ MainWindow::MainWindow(CO2SensorIF *co2Sensor, QWidget *parent)
 
 {
     ui->setupUi(this);
+    this->setWindowTitle("Dashboard");
     connect(m_co2Sensor, &CO2SensorIF::newCO2, this, &MainWindow::co2Update);
     connect(m_co2Sensor, &CO2SensorIF::newSweepGas, this, &MainWindow::sweepGasFlowUpdate);
 
@@ -55,23 +55,17 @@ MainWindow::MainWindow(CO2SensorIF *co2Sensor, QWidget *parent)
     qDebug() << qHostname;
     qDebug() << qPort;
     qDebug()<< "qAppVersion : "<<qAppVersion;
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-   // m_mqttClient->disconnectBroker();
 }
 
 void MainWindow::co2Update(QDateTime timestamp, float co2)
 {
     // ** update the m_lastReading **
-    double xVal = timestamp.toSecsSinceEpoch();
-    QDateTime dt;
-    dt.setTime_t(xVal/1000);
-    //ui->lineEdit_DateTime->setText(dt.toString("yyyy-MM-dd hh:mm:ss"));
-    qDebug() << dt.toString("hh:mm:ss");
+    double xVal = timestamp.toMSecsSinceEpoch();
     qDebug() << "xVal" << xVal << ", co2" << co2;
     setLastReadingCO2(QPointF(xVal, co2));
 }
@@ -79,7 +73,8 @@ void MainWindow::co2Update(QDateTime timestamp, float co2)
 void MainWindow::sweepGasFlowUpdate(QDateTime timestamp, float sweepGas)
 {
     // ** update the m_lastReading **
-    double xVal = timestamp.toSecsSinceEpoch();
+    double xVal = timestamp.toMSecsSinceEpoch();
+
     qDebug() << "xVal" << xVal << ", sweepGas" << sweepGas;
     setLastReadingSweepGas(QPointF(xVal, sweepGas));
 }
@@ -110,4 +105,3 @@ QPointF MainWindow::lastReadingSweepGas() const
     //qDebug() << "lastReadingSweepGas: " << m_lastReadingSweepGas;
     return m_lastReadingSweepGas;
 }
-
