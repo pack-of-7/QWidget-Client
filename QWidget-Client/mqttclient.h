@@ -46,28 +46,31 @@ public:
     QString appVersion() const;
     void setAppVersion(const QString &appVersion);
 
+    QString turnData() const;
+    void setTurnData(const QString &turnOnOff);
+    void updateTurnData();
+
     QMqttClient::ClientState state() const;
     QMqttSubscription subscribe(const QString &topic);
     QMqttSubscription messageReceived(QMqttMessage &msg, QMqttTopicName &topic);
-
 
     QMqttSubscription unsubscribe(const QMqttTopicFilter &topic);
     //QMqttClient::publish(const QMqttTopicName &topic, const QByteArray &message = QByteArray(), quint8 qos = 0, bool retain = false);
 
 signals:
     //sent when we are connected to the host
-    void HostConnectionUpdate(QString state, const QString &hostname,
+    void HostConnectionUpdate(QString msgStatus,QString state, const QString &hostname,
                               const quint16 port, const QString &id, const QString &appVersion, const QString &endpointToken);
 
 public slots:
-    void SendStatus(QString status,QByteArray &message);    //< Publish a new status
+    void SendStatus(QString status,QByteArray &message);
+    void SendStatus(QString status); //< Publish a new status
 
 private slots:
     //void messageReceived(const QByteArray &message, const QMqttTopicName &topic);
     void messageReceived(const QByteArray &message, const QMqttTopicName &topic = QMqttTopicName());
     void handleStateChange();
     void brokerDisconnected();
-
 
 private:
     QString         m_hostname;         //< the host to connect to
@@ -77,7 +80,7 @@ private:
     QMqttClient     *m_client;      //< the QMqttClient
 
     QString         m_deviceName;   //< A way to uniquely identify us
-
+    QString         m_turnOnOff;
 };
 
 #endif // MQQTCLIENT_H

@@ -72,6 +72,11 @@ void MqttClient::setEndpointToken(const QString &endpointToken)
     m_endpointToken=endpointToken;
 }
 
+QString MqttClient::appVersion() const
+{
+    return m_appVersion;
+}
+
 void MqttClient::setAppVersion(const QString &appVersion)
 {
     m_appVersion=appVersion;
@@ -95,6 +100,24 @@ void MqttClient::SendStatus(QString status,QByteArray &message)
     }
 }
 
+void MqttClient::SendStatus(QString status)
+{
+    qDebug() << "SendStatus(QString status) " << status;
+
+    if (m_client->state() == QMqttClient::Connected)
+    {
+        //kp1/application_version/dcx/endpoint_token/json/42/status
+        //messageReceived(status);
+        m_client->publish(status);
+        qDebug() << status;
+       // qDebug() << message;
+    }
+    else
+    {
+        qDebug() << "Broker is not connected!";
+    }
+}
+
 void MqttClient::messageReceived(const QByteArray &message, const QMqttTopicName &topic)
 {
     qDebug() << __FUNCTION__ << topic << ":" << message;
@@ -110,24 +133,31 @@ void MqttClient::handleStateChange()
 
     // convert enum to text by brute force
     QString stateName;
+    QString msgStatus;
     if (state == QMqttClient::Connected)
     {
         stateName = "Connected";
-          qDebug()<< "state " << stateName;
+        auto status = QString("Status : %1").arg(stateName);
+        msgStatus="ON";
+        qDebug()<< "state " << stateName;
     }
     else if (state == QMqttClient::Connecting)
     {
+        auto status = QString("Status : %1").arg(stateName);
+        QString msgStatus=status;
         stateName = "Connecting";
         qDebug()<<"state " << stateName;
     }
     else if (state == QMqttClient::Disconnected)
     {
+        auto status = QString("Status : %1").arg(stateName);
+        msgStatus="OFF";
         stateName = "Disconnected";
         qDebug() << "State "<< stateName ;
     }
 
     // emit the updated state
-    emit HostConnectionUpdate(stateName, m_hostname, m_port, m_deviceName, m_appVersion, m_endpointToken);
+    emit HostConnectionUpdate(msgStatus, stateName, m_hostname, m_port, m_deviceName, m_appVersion, m_endpointToken);
 }
 
 void MqttClient::brokerDisconnected()
@@ -148,6 +178,20 @@ void MqttClient::setDeviceName(const QString &deviceName)
     m_deviceName = deviceName;
 }
 
+QString MqttClient::turnData() const
+{
+    return m_turnOnOff;
+}
+
+void MqttClient::setTurnData(const QString &turnOnOff){
+    m_turnOnOff=turnOnOff;
+}
+
+void MqttClient::updateTurnData()
+{
+
+}
+
 //QMqttSubscription MqttClient::subscribe(const QMqttTopicFilter &topic){
 QMqttSubscription MqttClient::subscribe(const QString &topic){
     qDebug()<< "subscribe: " << topic;
@@ -164,3 +208,4 @@ QMqttClient::ClientState MqttClient::state() const
 {
     return m_client->state();
 }
+

@@ -17,7 +17,7 @@ private:
      float   m_lastSweepGas;
 
      QSettings   *t_settings;        //< access to our settings
-     MqttClient  *t_mqttClient;
+
 
      QString hostName="mqtt.cloud.kaaiot.com";    // Paste your host token
      QString endpoint_token = "DY5oex7rC3";       // Paste your endpoint token
@@ -28,6 +28,7 @@ private:
      QString qAppVersion="";
      QString qEndpointToken="";
 public:
+   MqttClient  *t_mqttClient;
    explicit CO2SensorIF(QObject *parent = nullptr);
 signals:
     void newCO2(QDateTime timestamp, float co2);
@@ -39,6 +40,7 @@ public slots:
      void sendDataCo2();
      void sendDataSweepGas();
      void sendDataCo2Gas();
+     void updateTurnData();
      QString getData();
 
 

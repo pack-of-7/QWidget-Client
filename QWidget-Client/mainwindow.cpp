@@ -1,14 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "mqttclient.h"
+#include "co2sensorif.h"
 #include <QtCore/QVariant>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QDateTime>
+#include <QMqttClient>
 #include <QtMqtt/QMqttClient>
 #include <QtWidgets/QMessageBox>
 #include <QMqttStringPair>
-#include <QtCore/QJsonObject>
+#include <Qt>
 #include <QString>
 #include <QSettings>
 #include <QRandomGenerator>
@@ -30,6 +32,8 @@ MainWindow::MainWindow(CO2SensorIF *co2Sensor, QWidget *parent)
     this->setWindowTitle("Dashboard");
     connect(m_co2Sensor, &CO2SensorIF::newCO2, this, &MainWindow::co2Update);
     connect(m_co2Sensor, &CO2SensorIF::newSweepGas, this, &MainWindow::sweepGasFlowUpdate);
+    connect(co2Sensor->t_mqttClient, &MqttClient::HostConnectionUpdate,
+            this, &MainWindow::updateMqttConnection);
 
     ui->quickWidget->engine()->rootContext()->setContextProperty("CO2Data", this);
     ui->quickWidget->engine()->rootContext()->setContextProperty("SweepGasData", this);
@@ -61,6 +65,43 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+void MainWindow::updateMqttConnection(QString msgStatus, QString state, const QString &hostname, const quint16 port, const QString &id)
+{
+    auto statusMsg=QString("Status: %1").arg(msgStatus);
+
+    qDebug() << "msgStatus: "<< msgStatus;
+   // QString htmlMsg=Qt
+    QString msg = statusMsg;
+    qDebug() << "msg: "<< msg;
+//    if(msg == "Status: OFF")
+//    {
+//        QMessageBox msgBox;
+//        msgBox.information(this, "MQTT Connection Information", statusMsg);
+
+//    }
+
+//   show a message box with the information
+//   QMessageBox::information(this, "MQTT Connection Information", statusMsg);
+
+//     Update the bottom statusBar with the status information.
+    statusBar()->showMessage(msg);
+}
+
+void MainWindow::setStatusConnected(const QString &status){
+    m_status=status;
+}
+void MainWindow::setStatusDisconnected(const QString &status){
+    m_status=status;
+}
+
+QString MainWindow::statusConnected() const{
+    return m_status;
+}
+
+QString MainWindow::statusDisconnected() const{
+    return m_status;
+}
+
 
 void MainWindow::co2Update(QDateTime timestamp, float co2)
 {

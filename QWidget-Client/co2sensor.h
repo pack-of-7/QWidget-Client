@@ -19,6 +19,7 @@ public:
     void sendDataCo2();
     void sendDataSweepGas();
 
+
 private:
     QTimer  *m_sendCO2Timer;
     float   m_lastCO2;

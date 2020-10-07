@@ -103,3 +103,7 @@ void CO2SensorIF::sendDataCo2Gas()
 {
 
 }
+void CO2SensorIF::updateTurnData()
+{
+
+}

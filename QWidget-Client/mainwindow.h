@@ -71,20 +71,33 @@ public:
 
     public slots:
 
+    QString statusConnected() const;
+    void setStatusConnected(const QString &m_status);
+
+    QString statusDisconnected() const;
+    void setStatusDisconnected(const QString &m_status);
+
 signals:
     void newReadingCO2();
     void newReadingSweepGas();
+    void sendStatus(const QString &m_status);
 
 private slots:
 
     void co2Update(QDateTime timestamp, float co2);
     void sweepGasFlowUpdate(QDateTime timestamp, float sweepGas);
+    void updateMqttConnection(QString msgStatus,QString state, const QString &hostname,
+                                 const quint16 port, const QString& id);
+
 
 //    void dataUpdate();
 
 
 private:
     Ui::MainWindow  *ui;
+
+    QString         m_status;
+
     QPointF         m_lastReadingCO2;
     QPointF         m_lastReadingSweepGas;
 
