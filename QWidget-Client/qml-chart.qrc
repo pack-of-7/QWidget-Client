@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>Chart.qml</file>
-    </qresource>
-</RCC>
