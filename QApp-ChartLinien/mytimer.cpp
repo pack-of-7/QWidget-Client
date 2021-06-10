@@ -48,7 +48,7 @@ MyTimer::MyTimer(QObject *parent) : QObject(parent)
     chart->legend()->hide();
     chart->addSeries(seriesCo2);
     chart->addSeries(seriesSweepGas);
-    chart->setTitle("<span style=\"padding-bottom:20px; font-weight:bold; font-size:16px; color: #ffffff;\">Chart CO2 Removal, Sweep Gas Flow</span>");
+//    chart->setTitle("<span style=\"padding-bottom:20px; font-weight:bold; font-size:16px; color: #ffffff;\">Chart CO2 Removal, Sweep Gas Flow</span>");
 
     axisX = new QDateTimeAxis();
     axisY_1 = new QValueAxis();
@@ -73,9 +73,9 @@ MyTimer::MyTimer(QObject *parent) : QObject(parent)
     axisY_1->setTickCount(8);
     axisY_2->setTickCount(8);
 
-    axisX->setTitleText("<span style=\"font-size:14px; margin:18px; color: #ffffff;\">Time</span>");
-    axisY_1->setTitleText("<span style=\"font-size14:1px; margin:18px; color: #ffffff;\">CO2 Removal</span>");
-    axisY_2->setTitleText("<span style=\"font-size14:1px; margin:18px; color: #ffffff;\">Sweep Gas Flow</span>");
+//    axisX->setTitleText("<span style=\"font-size:14px; margin:18px; color: #ffffff;\">Time</span>");
+    axisY_1->setTitleText("<span style=\"font-size16:1px; margin:18px; color: #ffffff;\">CO2 Removal</span>");
+    axisY_2->setTitleText("<span style=\"font-size16:1px; margin:18px; color: #ffffff;\">Sweep Gas Flow</span>");
 
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY_1,Qt::AlignLeft);
@@ -101,7 +101,8 @@ MyTimer::MyTimer(QObject *parent) : QObject(parent)
     backgroundGradient.setColorAt(0.0, QRgb(0x056087));
     backgroundGradient.setColorAt(1.0, QRgb(0x0b1324));
     backgroundGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    chart->setBackgroundBrush(backgroundGradient);
+//    chart->setBackgroundBrush(backgroundGradient);
+    chart->setBackgroundVisible(false);
 
     // Customize axis label font
      QFont labelsFont;
@@ -199,11 +200,11 @@ MyTimer::MyTimer(QObject *parent) : QObject(parent)
     dataWidget->setLayout(mainLayout);
 
     m_wChart.setCentralWidget(dataWidget);
-    m_wChart.resize(700, 700);
-    m_wChart.setWindowTitle("Dashboard");
+    //m_wChart.resize(700, 700);
+    //m_wChart.setWindowTitle("Dashboard");
     m_wChart.setStyleSheet("* {color: qlineargradient(spread:pad, x0:1 x0:1, y1:1 y1:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));"
                            "background: qlineargradient( x0:1 x0:1 , y1:1 y1:1, stop:0 #0b1324, stop:1 #056087);}");
-    m_wChart.show();
+    m_wChart.showFullScreen();
 
    //create Timer
     mTimer = new QTimer(this);
@@ -234,7 +235,7 @@ MyTimer::MyTimer(QObject *parent) : QObject(parent)
     }
         myTimerSlots();
          //msec
-    mTimer->start(4000);
+    mTimer->start(2000);
     }
 
 void MyTimer::myTimerSlots()
